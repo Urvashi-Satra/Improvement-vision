@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Demo Note App</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+       
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/style.css">
+
+        <style>
+            .note {
+    margin: 0 0 1rem 1rem;
+    width: 300px;
+    border: 1px solid rgba(0, 0, 0, .3);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(128, 128, 128, 0.3);
+    float: left;
+}
+.note-red {
+    background-color: #ff9999;
+}
+.note-orange {
+    background-color: #ffcc99;
+}
+.note-yellow {
+    background-color: #ffff99;
+}
+.note-green {
+    background-color: #ccff99;
+}
+.note-blue {
+    background-color: #cceeff;
+}
+.note-purple {
+    background-color: #ffccff;
+}
+.note-header {
+    padding: 1rem 1rem .5rem;
+    display: flex;
+}
+.note-title {
+    font-family: Arial, Tahoma, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
+    resize: none;
+    outline: none;
+    width: 100%;
+}
+.note-body {
+    width: 100%;
+    height: 200px;
+}
+.note-body textarea {
+    width: calc(100% - 2rem);
+    height: calc(100% - 1rem);
+    font-family: Arial, Tahoma, sans-serif;
+    font-size: 1rem;
+    padding: 0 1rem 1rem;
+    border: 0;
+    background-color: transparent;
+    resize: none;
+    outline: none;
+}
+.note-footer {
+    padding: 1rem;
+    display: flex;
+}
+.note-color-btn {
+    border: 1px solid rgba(0, 0, 0, .3);
+    width: 1rem;
+    height: 1rem;
+    margin-right: .25rem;
+    cursor: pointer;
+}
+.note-delete-btn {
+    border: 0;
+    background-color: transparent;
+    margin-left: auto;
+    cursor: pointer;
+    padding: 0;
+    width: 1rem;
+    height: 1rem;
+}
+.note-add-btn {
+    margin: 1rem;
+    border: 0;
+    font-size: 1rem;
+    font-family: Arial, Tahoma, sans-serif;
+    padding: .5rem 1rem;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .3);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(128, 128, 128, 0.3);
+    cursor: pointer;
+}
+        </style>
+    </head>
+    <body>
+       {{>usernavbar}}
+        <div id="app"></div>
+
+        <script >
+            'use strict';
+
+(function () {
+    class Note {
+        constructor(props = {}) {
+            this.props = {
+                colors: ['red', 'orange', 'yellow', 'green', 'blue', 'purple'],
+                ...props,
+            };
+
+            if (!this.props.color) {
+                // default to a random color
+                this.props.color = this.props.colors[
+                    Math.floor(Math.random() * this.props.colors.length)
+                ];
+            }
+        }
+
+        render() {
+            const note = document.createElement('div');
+            note.classList.add('note');
+            note.classList.add(`note-${this.props.color}`);
+            note.dataset.color = this.props.color;
+
+            note.appendChild((new NoteHeader()).render());
+            note.appendChild((new NoteBody()).render());
+            note.appendChild((new NoteFooter({ colors: this.props.colors })).render());
+
+            return note;
+        }
+    }
+
+    class NoteHeader {
+        render() {
+            const el = document.createElement('div');
+            el.classList.add('note-header');
+            el.appendChild((new NoteTitle()).render());
+
+            return el;
+        }
+    }
+
+    class NoteTitle {
+        constructor(props = {}) {
+            this.props = {
+                placeholder: 'Untitled Note',
+                ...props,
+            };
+        }
+
+        render() {
+            const el = document.createElement('input');
+            el.classList.add('note-title');
+            el.setAttribute('type', 'text');
+            el.setAttribute('placeholder', this.props.placeholder);
+
+            return el;
+        }
+    }
+
+    class NoteBody {
+        render() {
+            const el = document.createElement('div');
+            el.classList.add('note-body');
+            el.appendChild(document.createElement('textarea'));
+
+            return el;
+        }
+    }
+
+    class NoteFooter {
+        constructor(props = {}) {
+            this.props = {
+                colors: ['red', 'orange', 'yellow', 'green', 'blue', 'purple'],
+                ...props,
+            };
+        }
+
+        render() {
+            const el = document.createElement('div');
+            el.classList.add('note-footer');
+
+            this.props.colors.map((color) => {
+                el.appendChild((new NoteColorButton({ color })).render());
+            });
+
+            el.appendChild((new NoteDeleteButton()).render());
+
+            return el;
+        }
+    }
+
+    class NoteColorButton {
+        constructor(props = {}) {
+            this.props = {
+                color: '',
+                ...props,
+            };
+        }
+
+        handleClick(event) {
+            const button = event.currentTarget;
+            const note = button.closest('.note');
+            note.classList.remove(`note-${note.dataset.color}`);
+            note.classList.add(`note-${button.dataset.color}`);
+            note.dataset.color = button.dataset.color;
+        }
+
+        render() {
+            const el = document.createElement('button');
+            el.classList.add('note-color-btn', `note-${this.props.color}`);
+            el.setAttribute('type', 'button');
+            el.setAttribute('title', this.props.color);
+            el.setAttribute('aria-label', this.props.color);
+            el.dataset.color = this.props.color;
+
+            el.addEventListener('click', this.handleClick);
+
+            return el;
+        }
+    }
+
+    class NoteDeleteButton {
+        handleClick(event) {
+            const note = event.currentTarget.closest('.note');
+            note.parentNode.removeChild(note);
+        }
+
+        render() {
+            const el = document.createElement('button');
+            el.classList.add('note-delete-btn');
+            el.setAttribute('type', 'button');
+            el.setAttribute('aria-label', 'Delete');
+
+            const icon = document.createElement('i');
+            icon.classList.add('fa', 'fa-trash');
+            el.appendChild(icon);
+
+            el.addEventListener('click', this.handleClick);
+
+            return el;
+        }
+    }
+
+    class NoteAddButton {
+        constructor(props = {}) {
+            this.props = {
+                container: null,
+                ...props,
+            };
+        }
+
+        handleClick(event) {
+            this.props.container.appendChild((new Note()).render());
+        }
+
+        render() {
+            const el = document.createElement('button');
+            el.classList.add('note-add-btn');
+            el.setAttribute('type', 'button');
+            el.setAttribute('aria-label', 'Add');
+
+            const icon = document.createElement('i');
+            icon.classList.add('fa', 'fa-plus');
+            el.appendChild(icon);
+
+            const label = document.createElement('span');
+            label.textContent = ' Add a note';
+            el.appendChild(label);
+
+            el.addEventListener('click', this.handleClick.bind(this));
+
+            return el;
+        }
+    }
+
+    class App {
+        constructor(props = {}) {
+            this.props = {
+                id: 'app',
+                ...props,
+            };
+
+            this.render();
+        }
+
+        render() {
+            const container = document.getElementById(this.props.id);
+            const notes = document.createElement('div');
+
+            const addButton = (new NoteAddButton({ container: notes })).render();
+            container.appendChild(addButton);
+            addButton.click();
+
+            container.appendChild(notes);
+        }
+    }
+
+    new App();
+}());
+        </script>
+        
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    </body>
+</html>

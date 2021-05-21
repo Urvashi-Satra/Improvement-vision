@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylediary.css">
+    <title>Document</title>
+</head>
+<body>
+    
+    <header class="txt-center">
+        <h2>
+            Journal
+        </h2>
+    </header>
+
+    
+    <div class="wrapper txt-center"> 
+        <textarea name="" id="txt" cols="50" rows="5" placeholder="how's your day?"></textarea>
+        <div class="text-l">
+            <button onclick="getRS()">
+            Create
+             </button>
+        </div>
+    </div>
+    <div id="rs" class="wrapper"></div>
+
+    
+    <script >
+        function _(id){
+    return document.getElementById(id);
+}
+function getRS(){
+    let txt=_('txt').value 
+    const d =new Date()
+    _('rs').innerHTML+=`<div class="card"><p>${txt}</p>
+    <small>${d.toLocaleTimeString()},${d.toDateString()}</small></div>`
+}
+    </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+</body>
+</html>
